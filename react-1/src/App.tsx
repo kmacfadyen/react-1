@@ -7,15 +7,27 @@ type Synonym = { // States that all Synonyms will be assigned this type
   score: number;
 };
 
+const BASE_URL =  import.meta.env.VITE_BASE_URL ?? `https://api.datamuse.com`; // process.env.BASE_URL ??
+
 function App() {
   const [word, setWord] = useState("");
   const [synonyms, setSynonyms] = useState<Synonym[]>([]);
 
-  const handleFetchSynonyms = (e: React.FormEvent) => {
-    e.preventDefault();
-    fetch(`https://api.datamuse.com/words?rel_syn=${word}`) // fetches unique words from api
+  const fetchSynonyms = (word: string) => {
+    fetch(`${BASE_URL}/words?rel_syn=${word}`) // fetches unique words from api
       .then((response) => response.json()) 
       .then(setSynonyms);
+  }
+
+  const handleFetchSynonyms = (e: React.FormEvent) => {
+    e.preventDefault();
+    fetchSynonyms(word);
+  }
+
+  const handleSynonymClicked = (newWord: string) => {
+    // e.preventDefault();
+    setWord(newWord);
+    fetchSynonyms(newWord);
   }
 
   return (
@@ -32,7 +44,9 @@ function App() {
 
     <ul>
       {synonyms.map(synonym => (
-      <li key={synonym.word}> {/** creates a key for each individual item recieved */}
+      <li 
+        onClick={() => handleSynonymClicked(synonym.word)}
+        key={synonym.word}> {/** creates a key for each individual item recieved */}
         {synonym.word}
       </li>))}
     </ul> 
